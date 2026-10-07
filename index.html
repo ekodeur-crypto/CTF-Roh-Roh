@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="braise">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CTF Roh Roh</title>
+<!-- IAI{inspecter_cest_gagner} -->
+<style>
+:root{--font:system-ui,-apple-system,"Segoe UI",sans-serif}
+[data-theme=braise]{--bg:#1a1214;--card:#261a1d;--ink:#f4e9e6;--mute:#a8908a;--acc:#e5383b;--line:#3a2a2e;--on:#fff}
+[data-theme=craie]{--bg:#f6f3ef;--card:#fff;--ink:#231a1a;--mute:#7a6a68;--acc:#c1121f;--line:#e2dad5;--on:#fff}
+[data-theme=terminal]{--bg:#0c120e;--card:#131c15;--ink:#d7f5dc;--mute:#6f917a;--acc:#3ddc84;--line:#1f3324;--on:#06210f;--font:ui-monospace,Consolas,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--font)}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--line)}
+.brand{font-size:18px;margin-right:auto}
+nav button,.th button{font:inherit}
+nav button{background:none;border:0;color:var(--mute);padding:6px 10px;cursor:pointer;border-bottom:2px solid transparent}
+nav button.on{color:var(--ink);border-color:var(--acc)}
+#me{color:var(--mute);font-size:14px}
+.org{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}.org .btn{margin-top:0}
+#bk{margin:0 0 16px;padding:6px 12px}
+#tm{color:var(--acc);font-variant-numeric:tabular-nums}
+.th button{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);cursor:pointer;margin-left:4px;padding:0}
+main{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+h1{font-size:30px;line-height:1.15;margin:0 0 8px}
+p.l{color:var(--mute);margin:0 0 24px;max-width:56ch}
+label{display:block;font-size:14px;color:var(--mute);margin:14px 0 4px}
+input{width:100%;padding:11px 12px;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:4px}
+input:focus,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.btn{background:var(--acc);color:var(--on);border:0;border-radius:4px;padding:11px 20px;font:inherit;font-weight:700;cursor:pointer;margin-top:18px}
+.btn.alt{background:none;color:var(--ink);border:1px solid var(--line)}
+.row{display:flex;align-items:center;gap:16px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:14px 4px;color:var(--ink);font:inherit;cursor:pointer}
+.row:hover{background:var(--card)}
+.row .pt{min-width:56px;font-size:24px;font-weight:700;color:var(--acc)}
+.row small{display:block;color:var(--mute)}
+.row.ok{opacity:.55}.row.ok .pt{color:var(--mute)}
+.row .ck{margin-left:auto;color:var(--acc);font-weight:700}
+dialog{width:min(520px,92vw);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:24px}
+dialog::backdrop{background:#0009}
+code{background:var(--bg);padding:2px 6px;border-radius:3px;word-break:break-all}
+.ghost{color:transparent}.ghost::selection{background:var(--acc);color:var(--on)}
+#msg{min-height:24px;margin:10px 0 0;font-weight:700}
+.bad{color:var(--acc)}.good{color:var(--ink)}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:400;font-size:14px}
+td.n{width:44px;color:var(--mute)}td.s{text-align:right;font-weight:700}
+tr.me td{color:var(--acc)}
+#pod{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;z-index:9}
+#pod[hidden]{display:none}
+.pd{display:flex;align-items:flex-end;gap:10px;margin:30px 0}
+.pd div{width:min(26vw,180px);background:var(--acc);color:var(--on);text-align:center;padding:12px 6px;font-weight:700;word-break:break-word}
+@media(prefers-reduced-motion:no-preference){dialog[open]{animation:in .18s ease-out}@keyframes in{from{transform:translateY(8px);opacity:0}}}
+</style>
+</head>
+<body>
+<header>
+<b class="brand">CTF Roh Roh</b>
+<nav id="nav" hidden><button data-v="chal">Épreuves</button><button data-v="rank">Classement</button></nav>
+<b id="tm"></b>
+<span id="me"></span>
+<span class="th"><button data-t="braise" style="background:#e5383b" aria-label="Thème Braise"></button><button data-t="craie" style="background:#f6f3ef" aria-label="Thème Craie"></button><button data-t="terminal" style="background:#3ddc84" aria-label="Thème Terminal"></button></span>
+</header>
+<main>
+<button class="btn alt" id="bk" hidden>← Retour</button>
+<section id="reg">
+<h1>Prêt à capturer des flags ?</h1>
+<p class="l">Entre ton nom et ton prénom, puis lance le CTF. Ton chrono de <b id="du"></b> démarre dès que tu cliques sur le bouton, et chaque flag trouvé rapporte des points.</p>
+<label for="nom">Nom</label><input id="nom" autocomplete="family-name">
+<label for="pre">Prénom</label><input id="pre" autocomplete="given-name">
+<p id="err" class="bad"></p>
+<button class="btn" id="go">Lancer le CTF</button>
+</section>
+<section id="chal" hidden>
+<h1>Épreuves</h1>
+<p class="l">Les flags ont la forme <b>IAI{...}</b>. Un indice coûte 20 % des points de l'épreuve.</p>
+<div id="list"></div>
+</section>
+<section id="rank" hidden>
+<h1>Classement</h1>
+<p class="l">Classé par points. À égalité de points, le plus rapide passe devant. Le temps va du lancement au dernier flag validé.</p>
+<table><thead><tr><th></th><th>Joueur</th><th>Épreuves</th><th>Temps</th><th style="text-align:right">Points</th></tr></thead><tbody id="tb"></tbody></table>
+<div class="org"><button class="btn alt" id="fin">Podium final</button><button class="btn alt" id="st">Arrêter le CTF</button><button class="btn alt" id="rz">Tout réinitialiser</button></div>
+</section>
+</main>
+<dialog id="dlg">
+<h2 id="dt" style="margin:0 0 4px"></h2><small id="dm" style="color:var(--mute)"></small>
+<p id="dx"></p>
+<p id="dh" style="color:var(--mute)"></p>
+<input id="fl" placeholder="IAI{...}" autocomplete="off">
+<div id="msg"></div>
+<button class="btn" id="ok">Valider le flag</button>
+<button class="btn alt" id="hb">Voir l'indice</button>
+<button class="btn alt" id="cl">← Retour</button>
+</dialog>
+<div id="pod" hidden></div>
+<script>
+// ===== RÉGLAGES =====
+const CFG={url:'https://rgbppgqhtvkoqxlzjxvh.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnYnBwZ3FodHZrb3F4bHpqeHZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzNzQ0ODgsImV4cCI6MjEwNjk1MDQ4OH0.--6y-W1inFOQehCMmpZYPfEshiMWL4n_PAWcdQ2VTmQ',pin:'Ekolam@007',duree:300}; 
+const END=()=>me&&me.start_at?me.start_at+CFG.duree*6e4:0,over=()=>{if(ST.stop)return true;const e=END();return e&&Date.now()>=e};
+// ====================
+const $=s=>document.querySelector(s);
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const H=s=>{let a=0xdeadbeef,b=0x41c6ce57;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);a=Math.imul(a^c,2654435761);b=Math.imul(b^c,1597334677)}a=Math.imul(a^(a>>>16),2246822507)^Math.imul(b^(b>>>13),3266489909);b=Math.imul(b^(b>>>16),2246822507)^Math.imul(a^(a>>>13),3266489909);return(4294967296*(2097151&b)+(a>>>0)).toString(36)};
+const C=[
+{id:1,c:'Misc',t:'Bienvenue',p:50,x:'Le premier flag est offert : <code>IAI{bienvenue_au_ctf}</code>. Copie-le et valide.',i:'Il est écrit juste au-dessus.',h:'1dgbuvriiso'},
+{id:10,c:'Culture',t:'Port sécurisé',p:50,x:'Quel protocole utilise le port 443 par défaut ? Le flag est <b>IAI{protocole}</b>, en minuscules.',i:'Le cadenas dans la barre d\'adresse.',h:'1n6z3oc0mtl'},
+{id:2,c:'Crypto',t:'Base64',p:100,x:'Décode ce message : <code>SUFJe2Jhc2U2NF9lc3RfZmFjaWxlfQ==</code>',i:'Utilise un décodeur Base64 en ligne, ou atob() dans la console.',h:'1l5yg3z0t6v'},
+{id:4,c:'Web',t:'Sous le capot',p:100,x:'Le flag se cache dans le code source de cette page. Clic droit puis Inspecter, ou Ctrl+U.',i:'Cherche un commentaire HTML : &lt;!-- --&gt;.',h:'1ubpdhcfov4'},
+{id:6,c:'Web',t:'La console',p:100,x:'Cette page parle dans la console du navigateur. Ouvre-la avec F12, onglet Console.',i:'Recharge la page avec la console ouverte.',h:'9qqj5ot6yh'},
+{id:3,c:'Crypto',t:'César',p:150,x:'Jules César décalait chaque lettre de 3 rangs. Message : <code>LDL{fhvdu_hwdlw_urpdlq}</code>',i:'Recule chaque lettre de 3 : L devient I.',h:'1dehn1qm34o'},
+{id:5,c:'Crypto',t:'Hexadécimal',p:150,x:'Ces octets cachent un message : <code>4941497b6865785f6f755f7061735f6865787d</code>',i:'Chaque paire de chiffres est le code ASCII d\'un caractère : 49 = I.',h:'nenuex92rd'},
+{id:7,c:'Misc',t:'Texte invisible',p:150,x:'Un flag est juste ici, mais tu ne le vois pas : <span class="ghost">IAI{selectionne_tout}</span>',i:'Sélectionne tout le texte de la fenêtre avec Ctrl+A.',h:'1ymh22mnizc'},
+{id:8,c:'Programmation',t:'La somme',p:250,x:'Le flag est <b>IAI{N}</b>, où N est la somme de tous les nombres pairs de 2 à 1000 inclus.',i:'Écris une boucle, ou remarque que 2+4+…+1000 = 2 × (1+2+…+500).',h:'2a8d8ywovit'},
+{id:9,c:'Crypto',t:'Poupées russes',p:300,x:'Deux chiffrements empilés : <code>Vk5We2NiaGNycmZfZWhmZnJmfQ==</code>. Défais-les dans le bon ordre.',i:'D\'abord le Base64, ensuite un décalage de 13 lettres : le ROT13.',h:'fyrulattp1'}
+];
+// ----- stockage : Supabase si configuré, sinon localStorage -----
+const hd={apikey:CFG.key,Authorization:'Bearer '+CFG.key,'Content-Type':'application/json'};
+const LS=()=>JSON.parse(localStorage.getItem('ctf_p')||'{}');
+async function all(){if(CFG.url){const r=await fetch(CFG.url+'/rest/v1/players?select=*',{headers:hd});return r.json()}return Object.values(LS())}
+async function put(p){localStorage.setItem('ctf_me',JSON.stringify(p));if(CFG.url){await fetch(CFG.url+'/rest/v1/players',{method:'POST',headers:{...hd,Prefer:'resolution=merge-duplicates'},body:JSON.stringify(p)})}else{const o=LS();o[p.id]=p;localStorage.setItem('ctf_p',JSON.stringify(o))}}
+let me=JSON.parse(localStorage.getItem('ctf_me')||'null'),cur=null,timer;
+const total=p=>Object.values(p.solved).reduce((a,b)=>a+b,0);
+const dur=p=>p.start_at&&Object.keys(p.solved).length?p.last_at-p.start_at:0;
+const fmt=ms=>{const s=Math.round(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?h+'h '+String(m).padStart(2,'0')+'m':m+'m '+String(s%60).padStart(2,'0')+'s'};
+const cost=c=>Math.round(c.p*.2);
+let vw='',hist=[];
+function view(v,back){if(v==='reg')hist=[];else if(!back){const k=hist.lastIndexOf(v);if(k>=0)hist.length=k;else if(vw&&vw!=='reg'&&vw!==v)hist.push(vw)}vw=v;['reg','chal','rank'].forEach(x=>$('#'+x).hidden=x!==v);$('#bk').hidden=!hist.length;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));clearInterval(timer);if(v==='rank'){ranking();timer=setInterval(ranking,8000)}}
+$('#bk').onclick=()=>{const p=hist.pop();if(p)view(p,1)};
+function head(){$('#nav').hidden=!me;$('#me').textContent=me?me.prenom+' '+me.nom+' · '+total(me)+' pts':''}
+function list(){$('#list').innerHTML=C.map(c=>{const d=me.solved[c.id]!=null;return`<button class="row${d?' ok':''}" data-id="${c.id}"><span class="pt">${c.p}</span><span>${c.t}<small>${c.c}</small></span>${d?'<span class="ck">Validé +'+me.solved[c.id]+(me.hints['t'+c.id]?' · '+fmt(me.hints['t'+c.id]):'')+'</span>':''}</button>`}).join('')}
+async function ranking(){let a=[];try{a=(await all()).filter(p=>p.id!=='__etat__')}catch(e){$('#tb').innerHTML='<tr><td colspan="5" class="bad">Connexion impossible. Réessaie dans un instant.</td></tr>';return}
+a.forEach(p=>p.score=total(p));a.sort((x,y)=>y.score-x.score||(dur(x)||1e15)-(dur(y)||1e15)||x.last_at-y.last_at);
+$('#tb').innerHTML=a.length?a.map((p,i)=>`<tr class="${me&&p.id===me.id?'me':''}"><td class="n">${i+1}</td><td>${esc(p.prenom+' '+p.nom)}</td><td>${Object.keys(p.solved).length}/${C.length}</td><td>${dur(p)?fmt(dur(p))+(Object.keys(p.solved).length===C.length?' ✓':''):'—'}</td><td class="s">${p.score}</td></tr>`).join(''):'<tr><td colspan="5">Aucun joueur pour l\'instant.</td></tr>';return a}
+// ----- état partagé : arrêt général et réinitialisation -----
+let org=0,ST={stop:0,epoch:''};
+const ok=()=>org||(org=prompt('Code organisateur')===CFG.pin);
+async function getST(){try{if(CFG.url){const r=await fetch(CFG.url+'/rest/v1/players?id=eq.__etat__&select=hints',{headers:hd});const a=await r.json();return a[0]?a[0].hints:null}return JSON.parse(localStorage.getItem('ctf_st')||'null')}catch(e){return null}}
+async function setST(st){ST=st;if(CFG.url)await fetch(CFG.url+'/rest/v1/players',{method:'POST',headers:{...hd,Prefer:'resolution=merge-duplicates'},body:JSON.stringify({id:'__etat__',nom:'_',prenom:'_',solved:{},hints:st,start_at:0,last_at:0,epoch:''})});else localStorage.setItem('ctf_st',JSON.stringify(st))}
+async function sync(){const st=await getST();if(!st)return;ST=st;if(me&&(me.epoch||'')!==(st.epoch||'')){localStorage.removeItem('ctf_me');me=null;head();view('reg')}tick()}
+setInterval(sync,5000);
+$('#st').onclick=async()=>{if(!ok())return;await setST({...ST,stop:ST.stop?0:1});tick()};
+$('#rz').onclick=async()=>{if(!ok()||!confirm('Tout effacer : joueurs, scores et chronos ?'))return;
+if(CFG.url)await fetch(CFG.url+'/rest/v1/players?id=neq.-',{method:'DELETE',headers:hd});else localStorage.removeItem('ctf_p');
+localStorage.removeItem('ctf_me');me=null;await setST({stop:0,epoch:Date.now().toString(36)});head();view('reg')};
+// ----- actions -----
+$('#go').onclick=async()=>{const n=$('#nom').value.trim(),p=$('#pre').value.trim();if(!n||!p){$('#err').textContent='Renseigne ton nom et ton prénom.';return}
+me={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),nom:n,prenom:p,solved:{},hints:{},start_at:Date.now(),last_at:Date.now(),epoch:((await getST())||{}).epoch||''};await put(me);head();list();view('chal')};
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>view(b.dataset.v));
+document.querySelectorAll('.th button').forEach(b=>b.onclick=()=>{document.documentElement.dataset.theme=b.dataset.t;localStorage.setItem('ctf_t',b.dataset.t)});
+$('#list').onclick=e=>{const r=e.target.closest('.row');if(!r)return;cur=C.find(c=>c.id==r.dataset.id);const d=me.solved[cur.id]!=null;
+$('#dt').textContent=cur.t;$('#dm').textContent=cur.c+' · '+cur.p+' points';$('#dx').innerHTML=cur.x;$('#fl').value='';$('#msg').textContent=d?'Déjà validé.':'';
+$('#dh').innerHTML=me.hints[cur.id]?'Indice : '+cur.i:'';$('#hb').hidden=!!me.hints[cur.id]||d;$('#hb').textContent='Voir l\'indice (-'+cost(cur)+' pts)';$('#ok').hidden=d;$('#fl').hidden=d;$('#dlg').showModal()};
+$('#hb').onclick=async()=>{if(over())return;me.hints[cur.id]=1;await put(me);$('#dh').innerHTML='Indice : '+cur.i;$('#hb').hidden=true};
+$('#cl').onclick=()=>$('#dlg').close();
+function tick(){const e=END(),r=e-Date.now();$('#st').textContent=ST.stop?'Reprendre le CTF':'Arrêter le CTF';$('#tm').textContent=ST.stop?'CTF arrêté':!e?'':r<=0?'Temps écoulé':'Reste '+Math.floor(r/36e5)+'h '+String(Math.floor(r%36e5/6e4)).padStart(2,'0')+'m '+String(Math.floor(r%6e4/1e3)).padStart(2,'0')+'s'}
+setInterval(tick,1000);tick();
+async function check(){const v=$('#fl').value.trim().toLowerCase();if(!v)return;
+if(over()){$('#msg').className='bad';$('#msg').textContent='Le temps est écoulé : les flags ne sont plus acceptés.';return}
+if(H(v)===cur.h){me.solved[cur.id]=cur.p-(me.hints[cur.id]?cost(cur):0);me.last_at=Date.now();me.hints['t'+cur.id]=me.last_at-me.start_at;await put(me);head();list();$('#msg').className='good';$('#msg').textContent='Flag validé : +'+me.solved[cur.id]+' points.';$('#ok').hidden=true;$('#fl').hidden=true;$('#hb').hidden=true}
+else{$('#msg').className='bad';$('#msg').textContent='Ce n\'est pas le bon flag. Vérifie le format IAI{...}.'}}
+$('#ok').onclick=check;$('#fl').onkeydown=e=>{if(e.key==='Enter')check()};
+$('#fin').onclick=async()=>{if(!ok())return;const a=await ranking();if(!a||!a.length)return;
+const t=a.slice(0,3),o=[1,0,2].filter(i=>t[i]),hh=[60,100,40];
+$('#pod').innerHTML=`<h1>Podium final</h1><div class="pd">${o.map(i=>`<div style="height:${[150,200,120][i]}px"><div style="background:none;width:auto;color:inherit;font-size:20px">${i+1}</div>${esc(t[i].prenom+' '+t[i].nom)}<br>${t[i].score} pts${dur(t[i])?'<br>'+fmt(dur(t[i])):''}</div>`).join('')}</div><button class="btn alt" onclick="$('#pod').hidden=true">← Retour</button>`;$('#pod').hidden=false};
+$('#du').textContent=CFG.duree>=60?CFG.duree/60+' h':CFG.duree+' min';
+// ----- départ -----
+document.documentElement.dataset.theme=localStorage.getItem('ctf_t')||'braise';
+console.log('%cIAI{console_log_secret}','color:#e5383b;font-size:20px;font-weight:bold');
+console.log('Bien joué, tu as ouvert la console. Valide ce flag dans l\'épreuve « La console ».');
+sync();
+if(me){head();list();view('chal')}else view('reg');
+</script>
+</body>
+</html>
